@@ -15,6 +15,61 @@ import (
 
 var app *cli.App
 
+func generateAddress(ctype string, compress bool) (string, string, error) {
+	priv, err := btcec.NewPrivateKey(btcec.S256())
+	if err != nil {
+		return "", "", err
+	}
+
+	var p *chaincfg.Params
+	switch {
+	case strings.ToLower(ctype) == "bitcoin" || strings.ToLower(ctype) == "btc":
+		p = &chaincfg.MainNetParams
+		break
+	case strings.ToLower(ctype) == "litedoge" || strings.ToLower(ctype) == "ldoge":
+		p = &params.Litedoge
+		break
+	case strings.ToLower(ctype) == "paycoin" || strings.ToLower(ctype) == "xpy":
+		p = &params.Paycoin
+		break
+	default:
+		p = &chaincfg.MainNetParams
+		break
+	}
+
+	wif, err := btcutil.NewWIF(priv, p, compress)
+	if err != nil {
+		return "", "", err
+	}
+
+	var spub []byte
+	if compress {
+		spub = priv.PubKey().SerializeCompressed()
+	} else {
+		spub = priv.PubKey().SerializeUncompressed()
+	}
+
+	addr, err := btcutil.NewAddressPubKey(spub, p)
+	if err != nil {
+		return "", "", err
+	}
+
+	return wif.String(), addr.EncodeAddress(), nil
+}
+
+func searchLoop(vanity, ctype string, compress bool) (string, string, error) {
+	for {
+		wif, addr, err := generateAddress(ctype, compress)
+		if err != nil {
+			return "", "", err
+		}
+
+		if strings.HasPrefix(addr, vanity) {
+			return wif, addr, nil
+		}
+	}
+}
+
 func init() {
 	app = cli.NewApp()
 	app.Name = "ccgen"
@@ -22,6 +77,7 @@ func init() {
 	app.Version = "0.0.1"
 
 	var ctype string
+	var vanity string
 	var compress bool
 
 	app.Flags = []cli.Flag{
@@ -36,53 +92,33 @@ func init() {
 			Usage:       "Compress the private key and address",
 			Destination: &compress,
 		},
+		cli.StringFlag{
+			Name:        "vanity, V",
+			Value:       "",
+			Usage:       "Attempt to generate an address with the provided prefix",
+			Destination: &vanity,
+		},
 	}
 
 	app.Action = func(c *cli.Context) {
-		priv, err := btcec.NewPrivateKey(btcec.S256())
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		var p *chaincfg.Params
-		switch {
-		case strings.ToLower(ctype) == "bitcoin" || strings.ToLower(ctype) == "btc":
-			p = &chaincfg.MainNetParams
-			break
-		case strings.ToLower(ctype) == "litedoge" || strings.ToLower(ctype) == "ldoge":
-			p = &params.Litedoge
-			break
-		case strings.ToLower(ctype) == "paycoin" || strings.ToLower(ctype) == "xpy":
-			p = &params.Paycoin
-			break
-		default:
-			p = &chaincfg.MainNetParams
-			break
-		}
-
-		wif, err := btcutil.NewWIF(priv, p, compress)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		fmt.Printf("%s\n", wif.String())
-
-		var spub []byte
-		if compress {
-			spub = priv.PubKey().SerializeCompressed()
+		var wif string
+		var addr string
+		var err error
+		if vanity != "" {
+			wif, addr, err = searchLoop(vanity, ctype, compress)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 		} else {
-			spub = priv.PubKey().SerializeUncompressed()
+			wif, addr, err = generateAddress(ctype, compress)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 		}
 
-		addr, err := btcutil.NewAddressPubKey(spub, p)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		fmt.Printf("%s\n", addr.EncodeAddress())
+		fmt.Printf("%s\n%s\n", wif, addr)
 	}
 }
 
