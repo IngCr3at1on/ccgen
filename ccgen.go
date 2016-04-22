@@ -22,13 +22,19 @@ func init() {
 	app.Version = "0.0.1"
 
 	var ctype string
+	var compress bool
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:        "coin, c",
+			Name:        "type, t",
 			Value:       "bitcoin",
 			Usage:       "Define coin-type to generate an address for",
 			Destination: &ctype,
+		},
+		cli.BoolFlag{
+			Name:        "compress, c",
+			Usage:       "Compress the private key and address",
+			Destination: &compress,
 		},
 	}
 
@@ -55,7 +61,7 @@ func init() {
 			break
 		}
 
-		wif, err := btcutil.NewWIF(priv, p, true)
+		wif, err := btcutil.NewWIF(priv, p, compress)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -63,7 +69,14 @@ func init() {
 
 		fmt.Printf("%s\n", wif.String())
 
-		addr, err := btcutil.NewAddressPubKey(priv.PubKey().SerializeCompressed(), p)
+		var spub []byte
+		if compress {
+			spub = priv.PubKey().SerializeCompressed()
+		} else {
+			spub = priv.PubKey().SerializeUncompressed()
+		}
+
+		addr, err := btcutil.NewAddressPubKey(spub, p)
 		if err != nil {
 			fmt.Println(err)
 			return
