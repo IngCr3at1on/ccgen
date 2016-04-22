@@ -41,11 +41,14 @@ func init() {
 
 		var p *chaincfg.Params
 		switch {
-		case strings.ToLower(ctype) == "paycoin" || strings.ToLower(ctype) == "xpy":
-			p = &params.Paycoin
-			break
 		case strings.ToLower(ctype) == "bitcoin" || strings.ToLower(ctype) == "btc":
 			p = &chaincfg.MainNetParams
+			break
+		case strings.ToLower(ctype) == "litedoge" || strings.ToLower(ctype) == "ldoge":
+			p = &params.Litedoge
+			break
+		case strings.ToLower(ctype) == "paycoin" || strings.ToLower(ctype) == "xpy":
+			p = &params.Paycoin
 			break
 		default:
 			p = &chaincfg.MainNetParams
