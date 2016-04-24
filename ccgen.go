@@ -16,7 +16,7 @@ func init() {
 	app = cli.NewApp()
 	app.Name = "ccgen"
 	app.Usage = "Cryptocoin address generator"
-	app.Version = "0.0.1"
+	app.Version = "0.0.2"
 
 	var ctype string
 	var vanity string
