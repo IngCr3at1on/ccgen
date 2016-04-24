@@ -19,4 +19,4 @@ GLOBAL OPTIONS:
    --version, -v	print the version
 ```
 
-Currency supports Bitcoin, Paycoin and LiteDoge. Pull requests for coin support are welcome.
+Currently supports Bitcoin, Paycoin and LiteDoge. Pull requests for coin support are welcome.
