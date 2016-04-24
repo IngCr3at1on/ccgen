@@ -22,8 +22,8 @@ var (
 	defaultNumWorkers = uint32(runtime.NumCPU())
 )
 
-// SoVane (couldn't resist a random music reference somewhere)
-type SoVane struct {
+// SoVain (couldn't resist a random music reference somewhere)
+type SoVain struct {
 	Addr string
 	Wif  string
 
@@ -46,7 +46,7 @@ type SoVane struct {
 	Quit             chan struct{}
 }
 
-func (s *SoVane) speedMonitor() {
+func (s *SoVain) speedMonitor() {
 	var keysPerSec float64
 	var totalKeys uint64
 
@@ -81,7 +81,7 @@ out:
 	s.Wg.Done()
 }
 
-func (s *SoVane) generateAddress(quit chan struct{}) {
+func (s *SoVain) generateAddress(quit chan struct{}) {
 	ticker := time.NewTicker(time.Second * keyUpdateSecs)
 	defer ticker.Stop()
 
@@ -113,7 +113,7 @@ out:
 	s.Stop()
 }
 
-func (s *SoVane) generateWorkerController() {
+func (s *SoVain) generateWorkerController() {
 	var runningWorkers []chan struct{}
 	launchWorkers := func(numWorkers uint32) {
 		for i := uint32(0); i < numWorkers; i++ {
@@ -163,7 +163,7 @@ out:
 	s.Wg.Done()
 }
 
-func (s *SoVane) Start() {
+func (s *SoVain) Start() {
 	s.Lock()
 	defer s.Unlock()
 
@@ -180,7 +180,7 @@ func (s *SoVane) Start() {
 	s.started = true
 }
 
-func (s *SoVane) Stop() {
+func (s *SoVain) Stop() {
 	s.Lock()
 	defer s.Unlock()
 
@@ -194,10 +194,10 @@ func (s *SoVane) Stop() {
 	s.Finished = true
 }
 
-func NewVanityGen(coin, vane string, press bool) *SoVane {
-	return &SoVane{
+func NewVanityGen(coin, vain string, press bool) *SoVain {
+	return &SoVain{
 		ctype:            coin,
-		vanity:           vane,
+		vanity:           vain,
 		compress:         press,
 		numWorkers:       defaultNumWorkers,
 		updateNumWorkers: make(chan struct{}),

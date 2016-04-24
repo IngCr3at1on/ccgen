@@ -46,20 +46,20 @@ func init() {
 		var wif string
 		var addr string
 		if vanity != "" {
-			vane := gen.NewVanityGen(ctype, vanity, compress)
-			vane.Start()
+			vain := gen.NewVanityGen(ctype, vanity, compress)
+			vain.Start()
 		out:
-			for !vane.Finished {
+			for !vain.Finished {
 				select {
-				case <-vane.Quit:
-					vane.Wg.Wait()
+				case <-vain.Quit:
+					vain.Wg.Wait()
 					break out
 				default:
 				}
 			}
 
-			wif = vane.Wif
-			addr = vane.Addr
+			wif = vain.Wif
+			addr = vain.Addr
 		} else {
 			var err error
 			wif, addr, err = gen.GenerateAddress(ctype, compress)
