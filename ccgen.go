@@ -3,13 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
+	"runtime"
 
-	"github.com/IngCr3at1on/ccgen/params"
+	"github.com/IngCr3at1on/ccgen/gen"
 
-	"github.com/btcsuite/btcd/btcec"
-	"github.com/btcsuite/btcd/chaincfg"
-	"github.com/btcsuite/btcutil"
 	"github.com/codegangsta/cli"
 )
 
@@ -22,6 +19,7 @@ func init() {
 	app.Version = "0.0.1"
 
 	var ctype string
+	var vanity string
 	var compress bool
 
 	app.Flags = []cli.Flag{
@@ -36,56 +34,47 @@ func init() {
 			Usage:       "Compress the private key and address",
 			Destination: &compress,
 		},
+		cli.StringFlag{
+			Name:        "vanity, V",
+			Value:       "",
+			Usage:       "Attempt to generate an address with the provided prefix",
+			Destination: &vanity,
+		},
 	}
 
 	app.Action = func(c *cli.Context) {
-		priv, err := btcec.NewPrivateKey(btcec.S256())
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+		var wif string
+		var addr string
+		if vanity != "" {
+			vane := gen.NewVanityGen(ctype, vanity, compress)
+			vane.Start()
+		out:
+			for !vane.Finished {
+				select {
+				case <-vane.Quit:
+					vane.Wg.Wait()
+					break out
+				default:
+				}
+			}
 
-		var p *chaincfg.Params
-		switch {
-		case strings.ToLower(ctype) == "bitcoin" || strings.ToLower(ctype) == "btc":
-			p = &chaincfg.MainNetParams
-			break
-		case strings.ToLower(ctype) == "litedoge" || strings.ToLower(ctype) == "ldoge":
-			p = &params.Litedoge
-			break
-		case strings.ToLower(ctype) == "paycoin" || strings.ToLower(ctype) == "xpy":
-			p = &params.Paycoin
-			break
-		default:
-			p = &chaincfg.MainNetParams
-			break
-		}
-
-		wif, err := btcutil.NewWIF(priv, p, compress)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		fmt.Printf("%s\n", wif.String())
-
-		var spub []byte
-		if compress {
-			spub = priv.PubKey().SerializeCompressed()
+			wif = vane.Wif
+			addr = vane.Addr
 		} else {
-			spub = priv.PubKey().SerializeUncompressed()
+			var err error
+			wif, addr, err = gen.GenerateAddress(ctype, compress)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 		}
 
-		addr, err := btcutil.NewAddressPubKey(spub, p)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		fmt.Printf("%s\n", addr.EncodeAddress())
+		fmt.Printf("%s\n%s\n", wif, addr)
 	}
 }
 
 func main() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
 	app.Run(os.Args)
 }
