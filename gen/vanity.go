@@ -35,7 +35,6 @@ type SoVain struct {
 
 	numWorkers uint32
 	started    bool
-	Finished   bool
 
 	Wg               sync.WaitGroup
 	workerWg         sync.WaitGroup
@@ -110,7 +109,7 @@ out:
 	}
 
 	s.workerWg.Done()
-	s.Stop()
+	s.stop()
 }
 
 func (s *SoVain) generateWorkerController() {
@@ -180,7 +179,7 @@ func (s *SoVain) Start() {
 	s.started = true
 }
 
-func (s *SoVain) Stop() {
+func (s *SoVain) stop() {
 	s.Lock()
 	defer s.Unlock()
 
@@ -191,7 +190,6 @@ func (s *SoVain) Stop() {
 	close(s.Quit)
 
 	s.started = false
-	s.Finished = true
 }
 
 func NewVanityGen(coin, vain string, press bool) *SoVain {

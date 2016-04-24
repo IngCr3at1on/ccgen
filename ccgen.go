@@ -49,7 +49,7 @@ func init() {
 			vain := gen.NewVanityGen(ctype, vanity, compress)
 			vain.Start()
 		out:
-			for !vain.Finished {
+			for {
 				select {
 				case <-vain.Quit:
 					vain.Wg.Wait()
