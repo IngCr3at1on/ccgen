@@ -2,8 +2,8 @@ package params
 
 import "github.com/btcsuite/btcd/chaincfg"
 
-// Litedoge chopped down parameters
-var Litedoge = chaincfg.Params{
+// LiteDogeParams defines the chopped down LiteDoge parameters.
+var LiteDogeParams = chaincfg.Params{
 	Name: "litedoge",
 
 	PubKeyHashAddrID: 0x59 + 0x01, // starts with d

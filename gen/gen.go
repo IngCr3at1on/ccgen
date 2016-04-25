@@ -22,10 +22,10 @@ func GenerateAddress(ctype string, compress bool) (string, string, error) {
 		p = &chaincfg.MainNetParams
 		break
 	case strings.ToLower(ctype) == "litedoge" || strings.ToLower(ctype) == "ldoge":
-		p = &params.Litedoge
+		p = &params.LiteDogeParams
 		break
 	case strings.ToLower(ctype) == "paycoin" || strings.ToLower(ctype) == "xpy":
-		p = &params.Paycoin
+		p = &params.PaycoinParams
 		break
 	default:
 		p = &chaincfg.MainNetParams
