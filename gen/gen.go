@@ -21,6 +21,9 @@ func GenerateAddress(ctype string, compress bool) (string, string, error) {
 	case strings.ToLower(ctype) == "bitcoin" || strings.ToLower(ctype) == "btc":
 		p = &chaincfg.MainNetParams
 		break
+	case strings.ToLower(ctype) == "litecoin" || strings.ToLower(ctype) == "ltc":
+		p = &params.LitecoinParams
+		break
 	case strings.ToLower(ctype) == "litedoge" || strings.ToLower(ctype) == "ldoge":
 		p = &params.LiteDogeParams
 		break
