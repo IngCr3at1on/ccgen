@@ -30,6 +30,9 @@ func GenerateAddress(ctype string, compress bool) (string, string, error) {
 	case strings.ToLower(ctype) == "paycoin" || strings.ToLower(ctype) == "xpy":
 		p = &params.PaycoinParams
 		break
+	case strings.ToLower(ctype) == "denarius" || strings.ToLower(ctype) == "dnr":
+		p = &params.DenariusParams
+		break
 	default:
 		p = &chaincfg.MainNetParams
 		break

@@ -5,7 +5,19 @@
 
 ccgen is a simple(ish) semi-universal address and vanity address generator for cryptocurrency.
 
-*Currently supports Bitcoin, Paycoin and LiteDoge. Pull requests for coin support are welcome.*
+## Supported Coins
+
+Current List of Available Coins for Address Generation  
+-----
+|**Coin Short** | **Coin Name** | **Address Prefix**  |
+| --------------------------------------- | -------------------------------------------- | ------------ |
+|BTC | Bitcoin | 1  |
+|DNR | Denarius | D  |
+|LDOGE | LiteDoge | d  |
+|LTC | Litecoin | L  |
+|XPY | Paycoin | P  |
+
+*Pull requests for coin support are welcome.*
 
 ## Usage
 
