@@ -6,6 +6,6 @@ import "github.com/btcsuite/btcd/chaincfg"
 var LiteDogeParams = chaincfg.Params{
 	Name: "litedoge",
 
-	PubKeyHashAddrID: 0x59 + 0x01, // starts with d
-	PrivateKeyID:     0x99 + 0x12, // hacky?
+	PubKeyHashAddrID: 0x5A, // starts with d
+	PrivateKeyID:     0xAB, // starts with 6 (uncompressed) or S (compressed)
 }
